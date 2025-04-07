@@ -1,2 +1,1 @@
-def main() -> None:
-    print("Hello from hugo-unifier!")
+from hugo_unifier.main import main

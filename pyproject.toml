@@ -7,7 +7,10 @@ authors = [
     { name = "nictru", email = "nictru32@gmail.com" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "anndata>=0.11.4",
+    "rich-click>=1.8.8",
+]
 
 [project.scripts]
 hugo-unifier = "hugo_unifier:main"
