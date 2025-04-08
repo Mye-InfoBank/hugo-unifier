@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [project.scripts]
-hugo-unifier = "hugo_unifier:main"
+hugo-unifier = "hugo_unifier.main:main"
 
 [build-system]
 requires = ["hatchling"]

@@ -1,6 +1,8 @@
 import rich_click as click
 from importlib.metadata import version
-import os
+import anndata as ad
+
+from hugo_unifier import unify
 
 def validate_h5ad(ctx, param, value):
     """Validate that the file has a .h5ad suffix."""
@@ -15,9 +17,9 @@ def validate_h5ad(ctx, param, value):
 @click.option("--column", "-c", type=str, required=True, help="Column name to process.")
 def cli(input, output, column):
     """CLI for the hugo-unifier."""
-    click.echo(f"Input file: {input}")
-    click.echo(f"Output file: {output}")
-    click.echo(f"Column: {column}")
+    adata = ad.read_h5ad(input)
+
+    unify(adata, column, ["identity", "discard_after_dot", "dot_to_dash"], keep_gene_multiple_aliases=False)
 
 
 def main():

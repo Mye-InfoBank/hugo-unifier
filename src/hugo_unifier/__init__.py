@@ -1,1 +1,1 @@
-from hugo_unifier.main import main
+from hugo_unifier.unify import unify
