@@ -1,7 +1,4 @@
-import pandas as pd
-import anndata as ad
-from typing import Callable, Dict, List, Tuple, Set, Union
-import requests
+from typing import Dict, List, Tuple, Union
 
 from hugo_unifier.rules import manipulation_mapping
 from hugo_unifier.helpers import process
@@ -36,9 +33,9 @@ def unify(
     """
     # Assert all manipulations are valid
     for manipulation in manipulations:
-        assert manipulation in manipulation_mapping, (
-            f"Manipulation {manipulation} is not valid. Choose from {list(manipulation_mapping.keys())}."
-        )
+        assert (
+            manipulation in manipulation_mapping
+        ), f"Manipulation {manipulation} is not valid. Choose from {list(manipulation_mapping.keys())}."
 
     selected_manipulations = [
         (name, manipulation_mapping[name]) for name in manipulations

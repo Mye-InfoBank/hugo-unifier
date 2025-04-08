@@ -2,7 +2,6 @@ import rich_click as click
 from importlib.metadata import version
 import anndata as ad
 import json
-import pandas as pd
 
 from hugo_unifier import unify
 
