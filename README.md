@@ -47,4 +47,20 @@ More conservative manipulations are applied first. The first manipulation that r
 
 ### Resolution of aliases
 
-Documentation for this will be added soon.
+When resolving aliases, the following steps are applied:
+
+1. **Remove Conflicting Aliases**:  
+   Aliases that conflict with already approved symbols are removed. For example, if an alias maps to a symbol that is already approved, it is discarded to avoid conflicts.
+
+2. **Correct Same Aliases**:  
+   If an alias maps to the same symbol as its original symbol, it is corrected and marked as an approved symbol. This ensures that aliases that are effectively the same as the original symbol are treated as valid.
+
+3. **Handle Duplicate Aliases**:  
+   If multiple aliases map to the same original symbol:
+   - By default, only one alias is retained, and the rest are discarded.
+   - If the `keep_gene_multiple_aliases` option is enabled, all aliases are retained, and an identity mapping is created for the duplicates.
+
+4. **Unaccepted Aliases**:  
+   Any aliases that cannot be resolved or conflict with the above rules are marked as unaccepted and excluded from the final results.
+
+These steps ensure that aliases are resolved in a consistent and conflict-free manner, prioritizing approved symbols and avoiding ambiguity in the mapping process.
