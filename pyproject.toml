@@ -4,11 +4,12 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 authors = [
-    { name = "nictru", email = "nictru32@gmail.com" }
+    { name = "Nico Trummer", email = "nictru32@gmail.com" }
 ]
 requires-python = ">=3.12"
 dependencies = [
     "anndata>=0.11.4",
+    "requests>=2.32.3",
     "rich-click>=1.8.8",
 ]
 
@@ -18,3 +19,9 @@ hugo-unifier = "hugo_unifier.main:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+    "scanpy>=1.11.1",
+]
