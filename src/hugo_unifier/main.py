@@ -47,7 +47,6 @@ def cli(input, output, column, stats):
 
     updated_symbols, stats_dict = unify(
         symbols,
-        ["identity", "discard_after_dot", "dot_to_dash"],
         keep_gene_multiple_aliases=False,
         return_stats=True,
     )

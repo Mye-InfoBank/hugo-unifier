@@ -9,7 +9,7 @@ from hugo_unifier.helpers import process
 
 def unify(
     symbols: List[str],
-    manipulations: List[str],
+    manipulations: List[str] = ["identity", "discard_after_dot", "dot_to_dash"],
     keep_gene_multiple_aliases: bool = False,
     return_stats: bool = False,
 ) -> Union[List[str], Tuple[List[str], Dict[str, int]]]:
