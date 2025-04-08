@@ -1,10 +1,12 @@
 from typing import Callable, Dict
 
+
 def identity(symbol: str) -> str:
     """
     Return the symbol unchanged.
     """
     return symbol
+
 
 def discard_after_dot(symbol: str) -> str:
     """
@@ -12,11 +14,13 @@ def discard_after_dot(symbol: str) -> str:
     """
     return symbol.split(".")[0]
 
+
 def dot_to_dash(symbol: str) -> str:
     """
     Replace any dots in a symbol with dashes.
     """
     return symbol.replace(".", "-")
+
 
 manipulation_mapping: Dict[str, Callable[[str], str]] = {
     "identity": identity,

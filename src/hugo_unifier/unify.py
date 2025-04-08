@@ -8,10 +8,10 @@ from hugo_unifier.helpers import process
 
 
 def unify(
-        symbols: List[str],
-        manipulations: List[str],
-        keep_gene_multiple_aliases: bool = False,
-        return_stats: bool = False
+    symbols: List[str],
+    manipulations: List[str],
+    keep_gene_multiple_aliases: bool = False,
+    return_stats: bool = False,
 ) -> Union[List[str], Tuple[List[str], Dict[str, int]]]:
     """
     Unify gene symbols in a list of symbols.
@@ -36,12 +36,18 @@ def unify(
     """
     # Assert all manipulations are valid
     for manipulation in manipulations:
-        assert manipulation in manipulation_mapping, f"Manipulation {manipulation} is not valid. Choose from {list(manipulation_mapping.keys())}."
+        assert manipulation in manipulation_mapping, (
+            f"Manipulation {manipulation} is not valid. Choose from {list(manipulation_mapping.keys())}."
+        )
 
-    selected_manipulations = [(name, manipulation_mapping[name]) for name in manipulations]
+    selected_manipulations = [
+        (name, manipulation_mapping[name]) for name in manipulations
+    ]
 
     # Process the symbols
-    df_final, _, stats = process(symbols, selected_manipulations, keep_gene_multiple_aliases)
+    df_final, _, stats = process(
+        symbols, selected_manipulations, keep_gene_multiple_aliases
+    )
 
     # Create a mapping of original symbols to approved symbols
     df_final = df_final[~df_final["approved_symbol"].isna()].copy()

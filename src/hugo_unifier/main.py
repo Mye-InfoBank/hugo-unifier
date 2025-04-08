@@ -16,8 +16,22 @@ def validate_h5ad(ctx, param, value):
 
 @click.command()
 @click.version_option(version("hugo-unifier"))
-@click.option("--input", "-i", type=click.Path(exists=True), required=True, callback=validate_h5ad, help="Path to the input .h5ad file.")
-@click.option("--output", "-o", type=click.Path(), required=True, callback=validate_h5ad, help="Path to the output .h5ad file.")
+@click.option(
+    "--input",
+    "-i",
+    type=click.Path(exists=True),
+    required=True,
+    callback=validate_h5ad,
+    help="Path to the input .h5ad file.",
+)
+@click.option(
+    "--output",
+    "-o",
+    type=click.Path(),
+    required=True,
+    callback=validate_h5ad,
+    help="Path to the output .h5ad file.",
+)
 @click.option("--stats", "-s", type=click.Path(), help="Path to the output stats file.")
 @click.option("--column", "-c", type=str, required=True, help="Column name to process.")
 def cli(input, output, column, stats):
@@ -31,7 +45,12 @@ def cli(input, output, column, stats):
         assert column in adata.var.columns, f"Column {column} not found in input."
         symbols = adata.var[column].tolist()
 
-    updated_symbols, stats_dict = unify(symbols, ["identity", "discard_after_dot", "dot_to_dash"], keep_gene_multiple_aliases=False, return_stats=True)
+    updated_symbols, stats_dict = unify(
+        symbols,
+        ["identity", "discard_after_dot", "dot_to_dash"],
+        keep_gene_multiple_aliases=False,
+        return_stats=True,
+    )
 
     # Update the AnnData object
     if column == "index":
