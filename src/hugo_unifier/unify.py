@@ -1,6 +1,6 @@
 import pandas as pd
 import anndata as ad
-from typing import Callable, Dict, List, Tuple, Set
+from typing import Callable, Dict, List, Tuple, Set, Union
 import requests
 
 from hugo_unifier.rules import manipulation_mapping
@@ -8,29 +8,31 @@ from hugo_unifier.helpers import process
 
 
 def unify(
-        obj: pd.DataFrame | ad.AnnData,
-        column: str,
+        symbols: List[str],
         manipulations: List[str],
-        keep_gene_multiple_aliases: bool = False
-) -> Tuple[pd.DataFrame | ad.AnnData, Dict[str, int]]:
+        keep_gene_multiple_aliases: bool = False,
+        return_stats: bool = False
+) -> Union[List[str], Tuple[List[str], Dict[str, int]]]:
     """
-    Unify gene symbols in a DataFrame or AnnData object.
+    Unify gene symbols in a list of symbols.
 
     Parameters
     ----------
-    df : pd.DataFrame | ad.AnnData
-        DataFrame or AnnData object containing gene symbols.
-    column : str
-        Column name containing gene symbols. Set to "index" to use the index.
-    manipulations : List[Tuple[str, Callable[[str], str]]]
-        List of tuples containing manipulation names and functions.
+    symbols : List[str]
+        List of gene symbols to unify.
+    manipulations : List[str]
+        List of manipulation names to apply.
     keep_gene_multiple_aliases : bool, optional
         Whether to keep genes with multiple aliases, by default False.
+    return_stats : bool, optional
+        Whether to return statistics about the unification process, by default False.
 
     Returns
     -------
-    pd.DataFrame | ad.AnnData
-        DataFrame or AnnData object with unified gene symbols.
+    List[str]
+        Updated list of unified gene symbols.
+    Tuple[List[str], Dict[str, int]]
+        Updated list of unified gene symbols and statistics (if return_stats is True).
     """
     # Assert all manipulations are valid
     for manipulation in manipulations:
@@ -38,33 +40,16 @@ def unify(
 
     selected_manipulations = [(name, manipulation_mapping[name]) for name in manipulations]
 
-    is_anndata = False
-    if isinstance(obj, ad.AnnData):
-        is_anndata = True
-        df = obj.var.copy()
-    else:
-        df = obj.copy()
-    
-    assert isinstance(df, pd.DataFrame), "Input must be a pandas DataFrame or AnnData object."
-    assert column == "index" or column in obj.columns, f"Column {column} not found in input."
+    # Process the symbols
+    df_final, _, stats = process(symbols, selected_manipulations, keep_gene_multiple_aliases)
 
-    if column == "index":
-        symbols = df.index.tolist()
-    else:
-        symbols = df[column].tolist()
-
-    df_final, df_unaccepted, stats = process(symbols, selected_manipulations, keep_gene_multiple_aliases)
-
+    # Create a mapping of original symbols to approved symbols
     df_final = df_final[~df_final["approved_symbol"].isna()].copy()
     mapping = df_final["approved_symbol"].to_dict()
 
-    if column == "index":
-        df.index = df.index.map(lambda x: mapping.get(x, x))
-    else:
-        df[column] = df[column].map(lambda x: mapping.get(x, x))
+    # Update the symbols list
+    updated_symbols = [mapping.get(symbol, symbol) for symbol in symbols]
 
-    if is_anndata:
-        obj.var = df
-        return obj, stats
-    else:
-        return df, stats
+    if return_stats:
+        return updated_symbols, stats
+    return updated_symbols
