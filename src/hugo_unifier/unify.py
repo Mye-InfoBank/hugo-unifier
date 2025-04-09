@@ -1,7 +1,7 @@
 from typing import Dict, List, Tuple, Union
 
 from hugo_unifier.symbol_manipulations import manipulation_mapping
-from hugo_unifier.apply_manipulations import apply_manipulations
+from hugo_unifier.orchestrated_fetch import orchestrated_fetch
 from hugo_unifier.ingest_symbols import ingest_symbols
 from hugo_unifier.create_graph import create_graph
 from hugo_unifier.graph_manipulations import (
@@ -54,7 +54,7 @@ def unify(
     symbol_union = list(symbol_union)
 
     # Process the symbols
-    df_hugo = apply_manipulations(symbol_union, selected_manipulations)
+    df_hugo = orchestrated_fetch(symbol_union, selected_manipulations)
     df_symbols = ingest_symbols(df_hugo, symbols)
 
     G = create_graph(df_symbols)

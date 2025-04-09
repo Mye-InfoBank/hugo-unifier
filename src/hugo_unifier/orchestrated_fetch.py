@@ -3,7 +3,7 @@ from typing import Callable, List, Tuple
 from hugo_unifier.hugo_fetch import fetch_symbol_check_results
 
 
-def apply_manipulation(
+def fetch_manipulation(
     original_symbols: List[str], manipulation: Callable[[str], str]
 ) -> pd.DataFrame:
     df_manipulation = pd.DataFrame(original_symbols, columns=["original"])
@@ -18,7 +18,7 @@ def apply_manipulation(
     return df
 
 
-def apply_manipulations(
+def orchestrated_fetch(
     original_symbols: List[str], manipulations: List[Tuple[str, Callable[[str], str]]]
 ) -> pd.DataFrame:
     results = []
@@ -28,7 +28,7 @@ def apply_manipulations(
         if not remaining_symbols:
             break
 
-        df = apply_manipulation(remaining_symbols, manipulation)
+        df = fetch_manipulation(remaining_symbols, manipulation)
 
         # Remove values in df["input"] from remaining_symbols
         remaining_symbols = [
