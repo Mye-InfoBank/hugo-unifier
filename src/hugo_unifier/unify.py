@@ -74,4 +74,4 @@ def unify(
         # Apply the manipulation to the graph
         manipulation(G, df_changes)
 
-    return G
+    return G, df_changes

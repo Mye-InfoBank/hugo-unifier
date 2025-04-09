@@ -46,7 +46,7 @@ def __decide_successor__(G: nx.DiGraph, successors: List[str]):
     return None
 
 
-def resolve_unapproved(G: nx.DiGraph, df: pd.DataFrame) -> None:
+def resolve_unapproved(G: nx.DiGraph, df: pd.DataFrame) -> pd.DataFrame:
     for node in list(G.nodes()):
         if G.nodes[node]["type"] == "approvedSymbol":
             continue
@@ -58,15 +58,27 @@ def resolve_unapproved(G: nx.DiGraph, df: pd.DataFrame) -> None:
 
         node_samples = G.nodes[node]["samples"]
         successor_samples = G.nodes[successor]["samples"]
-        has_intersection = len(node_samples.intersection(successor_samples)) > 0
+        intersection = node_samples.intersection(successor_samples)
+        node_only = node_samples - intersection
+        has_intersection = len(intersection) > 0
 
-        G.nodes[successor]["samples"].update(node_samples)
+        action = "copy" if has_intersection else "rename"
+
+        for sample in node_only:
+            df.loc[len(df)] = [
+                sample,
+                action,
+                node,
+                successor,
+                "unapproved",
+            ]
+
+        G.nodes[successor]["samples"].update(node_only)
         if not has_intersection:
-            # Delete node
             G.remove_node(node)
 
 
-def aggregate_approved(G: nx.DiGraph, df: pd.DataFrame) -> None:
+def aggregate_approved(G: nx.DiGraph, df: pd.DataFrame) -> pd.DataFrame:
     marks = []
 
     for node in list(G.nodes()):
@@ -105,3 +117,12 @@ def aggregate_approved(G: nx.DiGraph, df: pd.DataFrame) -> None:
         union = G.nodes[node]["samples"]
         for predecessor in predecessors:
             union.update(G.nodes[predecessor]["samples"])
+
+            for sample in G.nodes[predecessor]["samples"]:
+                df.loc[len(df)] = [
+                    sample,
+                    "copy",
+                    predecessor,
+                    mark,
+                    "approved",
+                ]
