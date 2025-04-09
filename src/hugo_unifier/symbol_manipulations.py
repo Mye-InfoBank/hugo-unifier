@@ -10,7 +10,7 @@ def identity(symbol: str) -> str:
 
 def discard_after_dot(symbol: str) -> str:
     """
-    Discard any text after the last dot in a symbol.
+    Discard any text after the first dot in a symbol.
     """
     return symbol.split(".")[0]
 

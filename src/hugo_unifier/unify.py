@@ -1,13 +1,20 @@
 from typing import Dict, List, Tuple, Union
 
-from hugo_unifier.rules import manipulation_mapping
-from hugo_unifier.helpers import process
+from hugo_unifier.symbol_manipulations import manipulation_mapping
+from hugo_unifier.apply_manipulations import apply_manipulations
+from hugo_unifier.ingest_symbols import ingest_symbols
+from hugo_unifier.create_graph import create_graph
+from hugo_unifier.graph_manipulations import (
+    remove_self_edges,
+    remove_loose_ends,
+    resolve_unapproved,
+    aggregate_approved,
+)
 
 
 def unify(
-    symbols: List[str],
-    manipulations: List[str] = ["identity", "discard_after_dot", "dot_to_dash"],
-    keep_gene_multiple_aliases: bool = False,
+    symbols: Dict[str, List[str]],
+    manipulations: List[str] = ["identity", "dot_to_dash", "discard_after_dot"],
     return_stats: bool = False,
 ) -> Union[List[str], Tuple[List[str], Dict[str, int]]]:
     """
@@ -41,18 +48,26 @@ def unify(
         (name, manipulation_mapping[name]) for name in manipulations
     ]
 
+    symbol_union = set()
+    for sample_symbols in symbols.values():
+        symbol_union.update(sample_symbols)
+    symbol_union = list(symbol_union)
+
     # Process the symbols
-    df_final, _, stats = process(
-        symbols, selected_manipulations, keep_gene_multiple_aliases
-    )
+    df_hugo = apply_manipulations(symbol_union, selected_manipulations)
+    df_symbols = ingest_symbols(df_hugo, symbols)
 
-    # Create a mapping of original symbols to approved symbols
-    df_final = df_final[~df_final["approved_symbol"].isna()].copy()
-    mapping = df_final["approved_symbol"].to_dict()
+    G = create_graph(df_symbols)
 
-    # Update the symbols list
-    updated_symbols = [mapping.get(symbol, symbol) for symbol in symbols]
+    graph_manipulations = [
+        remove_self_edges,
+        remove_loose_ends,
+        resolve_unapproved,
+        aggregate_approved,
+    ]
 
-    if return_stats:
-        return updated_symbols, stats
-    return updated_symbols
+    for manipulation in graph_manipulations:
+        # Apply the manipulation to the graph
+        G = manipulation(G)
+
+    return G
