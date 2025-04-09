@@ -114,9 +114,8 @@ def aggregate_approved(G: nx.DiGraph, df: pd.DataFrame) -> pd.DataFrame:
         if any([predecessor in marks for predecessor in predecessors]):
             raise ValueError("Conflict")
 
-        union = G.nodes[node]["samples"]
         for predecessor in predecessors:
-            union.update(G.nodes[predecessor]["samples"])
+            G.nodes[node]["samples"].update(G.nodes[predecessor]["samples"])
 
             for sample in G.nodes[predecessor]["samples"]:
                 df.loc[len(df)] = [

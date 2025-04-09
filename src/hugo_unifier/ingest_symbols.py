@@ -21,4 +21,10 @@ def ingest_symbols(
         .reset_index()
     )
 
-    return df.merge(df_samples, on="original")
+    df_merged = df.merge(df_samples, on="original")
+
+    df_merged = df_merged.sort_values(
+        by=["original", "input", "approvedSymbol", "matchType", "resolution"]
+    )
+
+    return df_merged
