@@ -1,17 +1,16 @@
 import networkx as nx
+import pandas as pd
 from typing import List
 
 
-def remove_self_edges(G: nx.DiGraph) -> nx.DiGraph:
+def remove_self_edges(G: nx.DiGraph) -> None:
     # Remove all self edges
     for node in G.nodes():
         if G.has_edge(node, node):
             G.remove_edge(node, node)
 
-    return G
 
-
-def remove_loose_ends(G: nx.DiGraph) -> nx.DiGraph:
+def remove_loose_ends(G: nx.DiGraph) -> None:
     # Remove all approved nodes that only have one incoming edge, whose source is also approved
     for node in G.nodes():
         if G.nodes[node]["type"] != "approvedSymbol":
@@ -25,8 +24,6 @@ def remove_loose_ends(G: nx.DiGraph) -> nx.DiGraph:
         if G.nodes[source_node]["type"] != "approvedSymbol":
             continue
         G.remove_edge(source_node, node)
-
-    return G
 
 
 def __decide_successor__(G: nx.DiGraph, successors: List[str]):
@@ -49,7 +46,7 @@ def __decide_successor__(G: nx.DiGraph, successors: List[str]):
     return None
 
 
-def resolve_unapproved(G: nx.DiGraph) -> nx.DiGraph:
+def resolve_unapproved(G: nx.DiGraph, df: pd.DataFrame) -> None:
     for node in list(G.nodes()):
         if G.nodes[node]["type"] == "approvedSymbol":
             continue
@@ -68,10 +65,8 @@ def resolve_unapproved(G: nx.DiGraph) -> nx.DiGraph:
             # Delete node
             G.remove_node(node)
 
-    return G
 
-
-def aggregate_approved(G: nx.DiGraph) -> nx.DiGraph:
+def aggregate_approved(G: nx.DiGraph, df: pd.DataFrame) -> None:
     marks = []
 
     for node in list(G.nodes()):
@@ -110,5 +105,3 @@ def aggregate_approved(G: nx.DiGraph) -> nx.DiGraph:
         union = G.nodes[node]["samples"]
         for predecessor in predecessors:
             union.update(G.nodes[predecessor]["samples"])
-
-    return G

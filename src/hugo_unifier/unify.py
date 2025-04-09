@@ -1,4 +1,6 @@
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple, Union, Callable
+import pandas as pd
+import networkx as nx
 
 from hugo_unifier.symbol_manipulations import manipulation_mapping
 from hugo_unifier.orchestrated_fetch import orchestrated_fetch
@@ -58,16 +60,18 @@ def unify(
     df_symbols = ingest_symbols(df_hugo, symbols)
 
     G = create_graph(df_symbols)
+    remove_self_edges(G)
+    remove_loose_ends(G)
 
-    graph_manipulations = [
-        remove_self_edges,
-        remove_loose_ends,
+    graph_manipulations: List[Callable[[nx.DiGraph, pd.DataFrame]]] = [
         resolve_unapproved,
         aggregate_approved,
     ]
 
+    df_changes = pd.DataFrame(columns=["sample", "action", "symbol", "new", "reason"])
+
     for manipulation in graph_manipulations:
         # Apply the manipulation to the graph
-        G = manipulation(G)
+        manipulation(G, df_changes)
 
     return G
