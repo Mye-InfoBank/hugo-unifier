@@ -39,9 +39,9 @@ def apply_changes(adata: ad.AnnData, df_changes: pd.DataFrame):
             # Update the index value in a single row
             adata.var.rename(index={symbol: new_symbol}, inplace=True)
         elif action == "copy":
-            # Add a new row to the anndata object
-            adata_row = adata[adata.var.index == symbol].copy()
+            # Add a new row to the AnnData object
+            adata_row = adata[:, adata.var.index == symbol].copy()
             adata_row.var.index = [new_symbol]
-            adata = adata.concatenate(adata_row)
+            adata = ad.concat([adata, adata_row], axis=1)
 
     return adata
