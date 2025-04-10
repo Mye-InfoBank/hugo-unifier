@@ -54,7 +54,7 @@ def get(input, outdir):
     # Build a dictionary from file names and adata.var.index
     symbols_dict = {}
     for file_path in input:
-        adata = ad.read_h5ad(file_path)
+        adata = ad.read_h5ad(file_path, backed="r")
         file_name = os.path.basename(file_path)
         symbols_dict[file_name] = adata.var.index.tolist()
 
