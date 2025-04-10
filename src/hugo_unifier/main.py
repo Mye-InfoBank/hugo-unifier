@@ -61,10 +61,10 @@ def get(input, outdir):
         symbols_dict[file_name] = adata.var.index.tolist()
 
     # Process the symbols using get_changes
-    updated_symbols_dict, _ = get_changes(symbols_dict)
+    _, sample_changes = get_changes(symbols_dict)
 
     # Save the change DataFrames into the output directory
-    for file_name, df_changes in updated_symbols_dict.items():
+    for file_name, df_changes in sample_changes.items():
         output_file = os.path.join(outdir, f"{file_name}_changes.csv")
         df_changes.to_csv(output_file, index=False)
 
