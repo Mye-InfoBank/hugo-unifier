@@ -118,7 +118,7 @@ Iterate over all nodes in the graph that represent unapproved symbols and try to
 Now we have a source and a target node. Based on this, we can check if there is any dataset that has both the symbols in the source and target node. If that is the case, we would potentially loose some information if we would eliminate the source node. 
 Thus, we do the following:
 - If an overlap exists (like the "Devlin" dataset in the following example), copy the symbols that are exclusive to the source node to the target node ![Copy previous symbols](docs/previous-copy.png)
-- If no overlap exists, we can safely remove the source node and rename all symbols from the source node to the target node ![Rename alias symbols](docs/alias-rename.png)
+- If no overlap exists, we can safely remove the source node and rename all symbols from the source node to the target node ![Rename alias symbols](docs/dot-to-dash.png)
 
 #### Aggregate approved symbols
 
