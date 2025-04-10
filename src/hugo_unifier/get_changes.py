@@ -14,7 +14,7 @@ from hugo_unifier.graph_manipulations import (
 )
 
 
-def unify(
+def get_changes(
     symbols: Dict[str, List[str]],
     manipulations: List[str] = ["identity", "dot_to_dash", "discard_after_dot"],
 ) -> Union[List[str], Tuple[List[str], Dict[str, int]]]:
@@ -27,17 +27,11 @@ def unify(
         List of gene symbols to unify.
     manipulations : List[str]
         List of manipulation names to apply.
-    keep_gene_multiple_aliases : bool, optional
-        Whether to keep genes with multiple aliases, by default False.
-    return_stats : bool, optional
-        Whether to return statistics about the unification process, by default False.
 
     Returns
     -------
-    List[str]
-        Updated list of unified gene symbols.
-    Tuple[List[str], Dict[str, int]]
-        Updated list of unified gene symbols and statistics (if return_stats is True).
+    Sample changes : Dict[str, pd.DataFrame]
+        Dictionary of sample changes, where the key is the sample name and the value is a DataFrame with the changes.
     """
     # Assert all manipulations are valid
     for manipulation in manipulations:
@@ -73,4 +67,11 @@ def unify(
         # Apply the manipulation to the graph
         manipulation(G, df_changes)
 
-    return G, df_changes
+    sample_changes = {
+        sample: df_changes[df_changes["sample"] == sample]
+        .copy()
+        .drop(["sample"], axis=1)
+        for sample in symbols.keys()
+    }
+
+    return sample_changes

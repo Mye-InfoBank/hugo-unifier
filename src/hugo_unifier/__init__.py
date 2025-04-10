@@ -1,3 +1,3 @@
-from hugo_unifier.unify import unify
+from hugo_unifier.get_changes import get_changes
 
-__all__ = ["unify"]
+__all__ = ["get_changes"]

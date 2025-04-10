@@ -3,7 +3,7 @@ from importlib.metadata import version
 import anndata as ad
 import json
 
-from hugo_unifier import unify
+from hugo_unifier import get_changes
 
 
 def validate_h5ad(ctx, param, value):
@@ -44,7 +44,7 @@ def cli(input, output, column, stats):
         assert column in adata.var.columns, f"Column {column} not found in input."
         symbols = adata.var[column].tolist()
 
-    updated_symbols, stats_dict = unify(
+    updated_symbols, stats_dict = get_changes(
         symbols,
         keep_gene_multiple_aliases=False,
         return_stats=True,
