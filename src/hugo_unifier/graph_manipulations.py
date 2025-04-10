@@ -1,6 +1,5 @@
 import networkx as nx
 import pandas as pd
-from typing import List
 
 
 def remove_self_edges(G: nx.DiGraph) -> None:
@@ -26,9 +25,13 @@ def remove_loose_ends(G: nx.DiGraph) -> None:
         G.remove_edge(source_node, node)
 
 
-def __decide_successor__(G: nx.DiGraph, successors: List[str]):
+def __decide_successor__(G: nx.DiGraph, node: str, df: pd.DataFrame) -> str:
+    successors = list(G.successors(node))
+
     if len(successors) == 1:
         return successors[0]
+
+    node_samples = G.nodes[node]["samples"]
 
     successor_samples = {
         successor: G.nodes[successor]["samples"] for successor in successors
@@ -42,7 +45,13 @@ def __decide_successor__(G: nx.DiGraph, successors: List[str]):
     if len(nonempty_successors) == 1:
         return list(nonempty_successors)[0]
     if len(nonempty_successors) > 1:
-        print("Collision")
+        df.loc[len(df)] = [
+            None,
+            "conflict",
+            node,
+            None,
+            f"The unapproved symbol {node} is present in {node_samples} and has multiple connections to approved symbols, and multiple of them are present in samples: {', '.join([f'{successor} ({samples}' for successor, samples in nonempty_successors.items()])}. We cannot decide which one to use.",
+        ]
     return None
 
 
@@ -51,7 +60,7 @@ def resolve_unapproved(G: nx.DiGraph, df: pd.DataFrame) -> pd.DataFrame:
         if G.nodes[node]["type"] == "approvedSymbol":
             continue
 
-        successor = __decide_successor__(G, list(G.successors(node)))
+        successor = __decide_successor__(G, node, df)
 
         if successor is None:
             continue
@@ -62,6 +71,8 @@ def resolve_unapproved(G: nx.DiGraph, df: pd.DataFrame) -> pd.DataFrame:
         node_only = node_samples - intersection
         has_intersection = len(intersection) > 0
 
+        edge_type = G[node][successor]["type"]
+
         action = "copy" if has_intersection else "rename"
 
         for sample in node_only:
@@ -70,7 +81,7 @@ def resolve_unapproved(G: nx.DiGraph, df: pd.DataFrame) -> pd.DataFrame:
                 action,
                 node,
                 successor,
-                "unapproved",
+                f"{edge_type.capitalize().replace('_', ' ')}, {action} because {f'no sample contains both {node} and {successor}' if not has_intersection else f'the following samples contain both {node} and {successor}: {intersection}'}",
             ]
 
         G.nodes[successor]["samples"].update(node_only)
@@ -111,11 +122,19 @@ def aggregate_approved(G: nx.DiGraph, df: pd.DataFrame) -> pd.DataFrame:
 
     for mark in marks:
         predecessors = list(G.predecessors(mark))
-        if any([predecessor in marks for predecessor in predecessors]):
-            raise ValueError("Conflict")
+        intersection = set(predecessors).intersection(marks)
+        if len(intersection) > 0:
+            df.loc[len(df)] = [
+                None,
+                "conflict",
+                mark,
+                None,
+                f"The approved symbol {mark} could increase the overlap by pulling in other symbols ({predecessors}), however at least one of the other symbols ({intersection}) would also perform this operation. Two-level aggregation is not currently not supported.",
+            ]
 
         for predecessor in predecessors:
             G.nodes[node]["samples"].update(G.nodes[predecessor]["samples"])
+            edge_type = G[predecessor][mark]["type"]
 
             for sample in G.nodes[predecessor]["samples"]:
                 df.loc[len(df)] = [
@@ -123,5 +142,5 @@ def aggregate_approved(G: nx.DiGraph, df: pd.DataFrame) -> pd.DataFrame:
                     "copy",
                     predecessor,
                     mark,
-                    "approved",
+                    f"{predecessor} is an approved symbol, but it is also a {edge_type} of {mark}. Copying the contents of {predecessor} to {mark} because this leads to a substantial increase in overlap (> 50%).",
                 ]

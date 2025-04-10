@@ -17,7 +17,6 @@ from hugo_unifier.graph_manipulations import (
 def unify(
     symbols: Dict[str, List[str]],
     manipulations: List[str] = ["identity", "dot_to_dash", "discard_after_dot"],
-    return_stats: bool = False,
 ) -> Union[List[str], Tuple[List[str], Dict[str, int]]]:
     """
     Unify gene symbols in a list of symbols.
