@@ -59,3 +59,67 @@ def test_meg8():
 
     sample1_changes = sample_changes["sample1"]
     assert len(sample1_changes) == 0
+
+
+def test_cox2():
+    sample_symbols = {"sample1": ["COX2"], "sample2": ["MT-CO2"]}
+
+    _, sample_changes = get_changes(sample_symbols)
+    assert len(sample_changes) == 2
+
+    sample1_changes = sample_changes["sample1"]
+    assert len(sample1_changes) == 1
+    assert sample1_changes.iloc[0]["action"] == "rename"
+    assert sample1_changes.iloc[0]["symbol"] == "COX2"
+    assert sample1_changes.iloc[0]["new"] == "MT-CO2"
+
+    sample2_changes = sample_changes["sample2"]
+    assert len(sample2_changes) == 0
+
+
+def test_cox2_and_co2():
+    sample_symbols = {"sample1": ["COX2"], "sample2": ["MT-CO2", "COX2"]}
+
+    _, sample_changes = get_changes(sample_symbols)
+    assert len(sample_changes) == 2
+
+    sample1_changes = sample_changes["sample1"]
+    assert len(sample1_changes) == 1
+    assert sample1_changes.iloc[0]["action"] == "copy"
+    assert sample1_changes.iloc[0]["symbol"] == "COX2"
+    assert sample1_changes.iloc[0]["new"] == "MT-CO2"
+
+    sample2_changes = sample_changes["sample2"]
+    assert len(sample2_changes) == 0
+
+
+def test_cox3():
+    sample_symbols = {"sample1": ["COX3"], "sample2": ["MT-CO3"]}
+
+    _, sample_changes = get_changes(sample_symbols)
+    assert len(sample_changes) == 2
+
+    sample1_changes = sample_changes["sample1"]
+    assert len(sample1_changes) == 1
+    assert sample1_changes.iloc[0]["action"] == "rename"
+    assert sample1_changes.iloc[0]["symbol"] == "COX3"
+    assert sample1_changes.iloc[0]["new"] == "MT-CO3"
+
+    sample2_changes = sample_changes["sample2"]
+    assert len(sample2_changes) == 0
+
+
+def test_cox3_and_co1():
+    sample_symbols = {"sample1": ["COX3"], "sample2": ["MT-CO3", "COX3"]}
+
+    _, sample_changes = get_changes(sample_symbols)
+    assert len(sample_changes) == 2
+
+    sample1_changes = sample_changes["sample1"]
+    assert len(sample1_changes) == 1
+    assert sample1_changes.iloc[0]["action"] == "copy"
+    assert sample1_changes.iloc[0]["symbol"] == "COX3"
+    assert sample1_changes.iloc[0]["new"] == "MT-CO3"
+
+    sample2_changes = sample_changes["sample2"]
+    assert len(sample2_changes) == 0
