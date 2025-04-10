@@ -1,6 +1,6 @@
 [project]
 name = "hugo-unifier"
-version = "0.1.2"
+version = "0.2.0"
 description = "Add your description here"
 readme = "README.md"
 authors = [
@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "anndata>=0.11.4",
+    "networkx>=3.4.2",
     "requests>=2.32.3",
     "rich-click>=1.8.8",
 ]
@@ -22,6 +23,7 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
+    "ipykernel>=6.29.5",
     "pytest>=8.3.5",
     "ruff>=0.11.4",
     "scanpy>=1.11.1",
