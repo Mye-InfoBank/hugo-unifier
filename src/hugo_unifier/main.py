@@ -2,8 +2,9 @@ import rich_click as click
 from importlib.metadata import version
 import anndata as ad
 import os
+import pandas as pd
 
-from hugo_unifier import get_changes
+from hugo_unifier import get_changes, apply_changes
 
 
 def validate_h5ad(ctx, param, value):
@@ -22,8 +23,14 @@ def validate_h5ad(ctx, param, value):
     return value
 
 
-@click.command()
+@click.group()
 @click.version_option(version("hugo-unifier"))
+def cli():
+    """CLI for the hugo-unifier."""
+    pass
+
+
+@cli.command()
 @click.option(
     "--input",
     "-i",
@@ -40,8 +47,8 @@ def validate_h5ad(ctx, param, value):
     required=True,
     help="Path to the output directory for change DataFrames.",
 )
-def cli(input, outdir):
-    """CLI for the hugo-unifier."""
+def get(input, outdir):
+    """Get changes for the input .h5ad files."""
 
     # Create output directory if it doesn't exist
     os.makedirs(outdir, exist_ok=True)
@@ -60,6 +67,43 @@ def cli(input, outdir):
     for file_name, df_changes in updated_symbols_dict.items():
         output_file = os.path.join(outdir, f"{file_name}_changes.csv")
         df_changes.to_csv(output_file, index=False)
+
+
+@cli.command()
+@click.option(
+    "--input",
+    "-i",
+    type=click.Path(exists=True),
+    required=True,
+    callback=validate_h5ad,
+    help="Path to the input .h5ad file.",
+)
+@click.option(
+    "--changes",
+    "-c",
+    type=click.Path(exists=True),
+    required=True,
+    help="Path to the changes CSV file.",
+)
+@click.option(
+    "--output",
+    "-o",
+    type=click.Path(writable=True),
+    required=True,
+    help="Path to save the updated .h5ad file.",
+)
+def apply(input, changes, output):
+    """Apply changes to the input .h5ad file."""
+
+    # Load the AnnData object and changes DataFrame
+    adata = ad.read_h5ad(input)
+    df_changes = pd.read_csv(changes)
+
+    # Apply the changes
+    updated_adata = apply_changes(adata, df_changes)
+
+    # Save the updated AnnData object
+    updated_adata.write_h5ad(output)
 
 
 def main():
