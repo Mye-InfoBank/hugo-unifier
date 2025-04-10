@@ -11,10 +11,13 @@ def test_cli_get_changes(test_h5ad_paths, tmp_path):
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Prepare the CLI command
-    cmd = ["hugo-unifier", "get"]
-    for file in input_files:
-        cmd.extend(["--input", str(file)])
-    cmd.extend(["--outdir", str(output_dir)])
+    cmd = [
+        "hugo-unifier",
+        "get",
+        "--outdir",
+        str(output_dir),
+        *[str(f) for f in input_files],
+    ]
 
     # Run the command
     result = subprocess.run(cmd, capture_output=True, text=True)

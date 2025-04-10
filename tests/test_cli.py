@@ -31,7 +31,7 @@ def test_cli_get_help():
     result = subprocess.run(cmd, capture_output=True, text=True)
     assert result.returncode == 0, f"Command failed with error: {result.stderr}"
     assert "Usage:" in result.stdout, "Expected usage information not found in output."
-    assert "--input" in result.stdout, "Expected --input option not found in output."
+    assert "INPUT" in result.stdout, "Expected INPUT argument not found in output."
     assert "--outdir" in result.stdout, "Expected --outdir option not found in output."
     assert (
         "Get changes for the input .h5ad files." in result.stdout

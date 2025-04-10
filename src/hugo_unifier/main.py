@@ -31,14 +31,12 @@ def cli():
 
 
 @cli.command()
-@click.option(
-    "--input",
-    "-i",
+@click.argument(
+    "input",
     type=click.Path(exists=True),
-    multiple=True,
     required=True,
+    nargs=-1,
     callback=validate_h5ad,
-    help="Paths to the input .h5ad files (can specify multiple).",
 )
 @click.option(
     "--outdir",
