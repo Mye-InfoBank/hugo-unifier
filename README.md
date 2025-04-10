@@ -81,7 +81,9 @@ Different symbols can sometimes have quite complex relationships.
 For example, a symbol can be an alias or a previous symbol for multiple other symbols, or a symbol can have multiple aliases or previous symbols. These relationships can be nicely visualized in a graph.
 
 An example for this is shown here:
-![Graph example](docs/graph.png)
+
+![Graph example](docs/example.png)
+
 Green nodes are approved symbols, blue ones are not.
 
 The graph is constructed as follows:
@@ -115,8 +117,8 @@ Iterate over all nodes in the graph that represent unapproved symbols and try to
 
 Now we have a source and a target node. Based on this, we can check if there is any dataset that has both the symbols in the source and target node. If that is the case, we would potentially loose some information if we would eliminate the source node. 
 Thus, we do the following:
-- If an overlap exists, copy the symbols that are exclusive to the source node to the target node
-- If no overlap exists, we can safely remove the source node and rename all symbols from the source node to the target node
+- If an overlap exists (like the "Devlin" dataset in the following example), copy the symbols that are exclusive to the source node to the target node ![Copy previous symbols](docs/previous-copy.png)
+- If no overlap exists, we can safely remove the source node and rename all symbols from the source node to the target node ![Rename alias symbols](docs/alias-rename.png)
 
 #### Aggregate approved symbols
 
@@ -128,6 +130,10 @@ This tries to resolve situations where one group of datasets contains one approv
 4. Get the maximum number of datasets that are represented by any single predecessor or the node itself
 5. Calculate the improvement ratio as the union size divided by the maximum size
 6. If the improvement ratio is greater than 1.5, copy the symbols from all predecessors to the node
+
+In the example below, the STRA13 gene would be copied to CENPX for all samples that have CENPX but not STRA13. This is because the union is 9 and the largest number of datasets in a single one of the two nodes is 6 in CENPX. The improvement ratio is exactly 1.5, so the copy is done.
+
+![Aggregation of approved symbols](docs/approved-aggregation.png)
 
 ### Step 4: Provide change dataframe
 
