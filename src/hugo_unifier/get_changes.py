@@ -74,4 +74,4 @@ def get_changes(
         for sample in symbols.keys()
     }
 
-    return sample_changes
+    return G, sample_changes

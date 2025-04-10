@@ -1,15 +1,24 @@
 import rich_click as click
 from importlib.metadata import version
 import anndata as ad
-import json
+import os
 
 from hugo_unifier import get_changes
 
 
 def validate_h5ad(ctx, param, value):
     """Validate that the file has a .h5ad suffix."""
-    if value and not value.endswith(".h5ad"):
-        raise click.BadParameter(f"{param.name} must be a file with a .h5ad suffix.")
+    if value:
+        if isinstance(value, tuple):
+            for v in value:
+                if not v.endswith(".h5ad"):
+                    raise click.BadParameter(
+                        f"{param.name} must be files with a .h5ad suffix."
+                    )
+        elif not value.endswith(".h5ad"):
+            raise click.BadParameter(
+                f"{param.name} must be a file with a .h5ad suffix."
+            )
     return value
 
 
@@ -19,50 +28,38 @@ def validate_h5ad(ctx, param, value):
     "--input",
     "-i",
     type=click.Path(exists=True),
+    multiple=True,
     required=True,
     callback=validate_h5ad,
-    help="Path to the input .h5ad file.",
+    help="Paths to the input .h5ad files (can specify multiple).",
 )
 @click.option(
-    "--output",
+    "--outdir",
     "-o",
-    type=click.Path(),
+    type=click.Path(file_okay=False, writable=True),
     required=True,
-    callback=validate_h5ad,
-    help="Path to the output .h5ad file.",
+    help="Path to the output directory for change DataFrames.",
 )
-@click.option("--stats", "-s", type=click.Path(), help="Path to the output stats file.")
-@click.option("--column", "-c", type=str, required=True, help="Column name to process.")
-def cli(input, output, column, stats):
+def cli(input, outdir):
     """CLI for the hugo-unifier."""
-    adata = ad.read_h5ad(input)
 
-    # Determine if the column is in the index or a column
-    if column == "index":
-        symbols = adata.var.index.tolist()
-    else:
-        assert column in adata.var.columns, f"Column {column} not found in input."
-        symbols = adata.var[column].tolist()
+    # Create output directory if it doesn't exist
+    os.makedirs(outdir, exist_ok=True)
 
-    updated_symbols, stats_dict = get_changes(
-        symbols,
-        keep_gene_multiple_aliases=False,
-        return_stats=True,
-    )
+    # Build a dictionary from file names and adata.var.index
+    symbols_dict = {}
+    for file_path in input:
+        adata = ad.read_h5ad(file_path)
+        file_name = os.path.basename(file_path)
+        symbols_dict[file_name] = adata.var.index.tolist()
 
-    # Update the AnnData object
-    if column == "index":
-        adata.var.index = updated_symbols
-    else:
-        adata.var[column] = updated_symbols
+    # Process the symbols using get_changes
+    updated_symbols_dict, _ = get_changes(symbols_dict)
 
-    # Save stats if requested
-    if stats:
-        with open(stats, "w") as f:
-            json.dump(stats_dict, f, indent=4)
-
-    # Write the updated AnnData object to the output file
-    adata.write_h5ad(output)
+    # Save the change DataFrames into the output directory
+    for file_name, df_changes in updated_symbols_dict.items():
+        output_file = os.path.join(outdir, f"{file_name}_changes.csv")
+        df_changes.to_csv(output_file, index=False)
 
 
 def main():

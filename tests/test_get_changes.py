@@ -4,7 +4,7 @@ from hugo_unifier import get_changes
 def test_cox1():
     sample_symbols = {"sample1": ["COX1"], "sample2": ["MT-CO1"]}
 
-    sample_changes = get_changes(sample_symbols)
+    _, sample_changes = get_changes(sample_symbols)
     assert len(sample_changes) == 2
 
     sample1_changes = sample_changes["sample1"]
@@ -20,7 +20,7 @@ def test_cox1():
 def test_cox1_and_co1():
     sample_symbols = {"sample1": ["COX1"], "sample2": ["MT-CO1", "COX1"]}
 
-    sample_changes = get_changes(sample_symbols)
+    _, sample_changes = get_changes(sample_symbols)
     assert len(sample_changes) == 2
 
     sample1_changes = sample_changes["sample1"]
@@ -31,3 +31,15 @@ def test_cox1_and_co1():
 
     sample2_changes = sample_changes["sample2"]
     assert len(sample2_changes) == 0
+
+
+def test_single_sample():
+    sample_symbols = {"sample1": ["COX1"]}
+
+    _, sample_changes = get_changes(sample_symbols)
+    assert len(sample_changes) == 1
+
+    sample1_changes = sample_changes["sample1"]
+    # This does not change, because COX1 could refer to PTGS1 or MT-CO1
+    # And we do not have another sample to base the decision on
+    assert len(sample1_changes) == 0
