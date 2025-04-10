@@ -1,7 +1,7 @@
 [project]
 name = "hugo-unifier"
 version = "0.2.1"
-description = "Add your description here"
+description = "Python package that can unify gene symbols across datasets based on the HUGO database."
 readme = "README.md"
 authors = [
     { name = "Nico Trummer", email = "nictru32@gmail.com" }
