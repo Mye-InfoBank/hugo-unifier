@@ -82,7 +82,7 @@ For example, a symbol can be an alias or a previous symbol for multiple other sy
 
 An example for this is shown here:
 
-![Graph example](docs/example.png)
+![Graph example](https://github.com/Mye-InfoBank/hugo-unifier/blob/main/docs/example.png?raw=true)
 
 Green nodes are approved symbols, blue ones are not.
 
@@ -117,8 +117,8 @@ Iterate over all nodes in the graph that represent unapproved symbols and try to
 
 Now we have a source and a target node. Based on this, we can check if there is any dataset that has both the symbols in the source and target node. If that is the case, we would potentially loose some information if we would eliminate the source node. 
 Thus, we do the following:
-- If an overlap exists (like the "Devlin" dataset in the following example), copy the symbols that are exclusive to the source node to the target node ![Copy previous symbols](docs/previous-copy.png)
-- If no overlap exists, we can safely remove the source node and rename all symbols from the source node to the target node ![Rename alias symbols](docs/dot-to-dash.png)
+- If an overlap exists (like the "Devlin" dataset in the following example), copy the symbols that are exclusive to the source node to the target node ![Copy previous symbols](https://github.com/Mye-InfoBank/hugo-unifier/blob/main/docs/previous-copy.png?raw=true)
+- If no overlap exists, we can safely remove the source node and rename all symbols from the source node to the target node ![Rename alias symbols](https://github.com/Mye-InfoBank/hugo-unifier/blob/main/docs/dot-to-dash.png?raw=true)
 
 #### Aggregate approved symbols
 
@@ -133,7 +133,7 @@ This tries to resolve situations where one group of datasets contains one approv
 
 In the example below, the STRA13 gene would be copied to CENPX for all samples that have CENPX but not STRA13. This is because the union is 9 and the largest number of datasets in a single one of the two nodes is 6 in CENPX. The improvement ratio is exactly 1.5, so the copy is done.
 
-![Aggregation of approved symbols](docs/approved-aggregation.png)
+![Aggregation of approved symbols](https://github.com/Mye-InfoBank/hugo-unifier/blob/main/docs/approved-aggregation.png?raw=true)
 
 ### Step 4: Provide change dataframe
 
