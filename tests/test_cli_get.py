@@ -47,8 +47,6 @@ def test_cli_get_with_aliases(test_h5ad_paths, tmp_path):
     # Prepare the CLI command
     cmd = ["hugo-unifier", "get", "--outdir", str(output_dir)]
 
-    print("input_files", input_files)
-
     for i, input_file in enumerate(input_files):
         cmd.extend(["--input", f"ds{i}:{input_file}"])
 
