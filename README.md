@@ -21,11 +21,17 @@ It operates in a two-step process:
 ### Command Line Tool
 
 ```bash
-hugo-unifier get --outdir . test1.h5ad test2.h5ad
+hugo-unifier get --input test1.h5ad --input test2.h5ad --outdir changes
 ```
 
 This will create two files, `test1_changes.csv` and `test2_changes.csv` in the current directory.
 These files can be manually inspected to see what changes will be made and what the reasons for each change are.
+
+Alternatively, the datasets can be given names other than the filenames using this syntax:
+
+```bash
+hugo-unifier get --input test1:abc.h5ad --input test2:xyz.h5ad --outdir changes
+```
 
 The command line tool can also be used to apply the changes to the input data:
 
