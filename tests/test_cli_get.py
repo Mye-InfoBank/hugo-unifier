@@ -4,7 +4,7 @@ import subprocess
 def test_cli_get_changes(test_h5ad_paths, tmp_path):
     """Test the CLI 'get' command for generating changes."""
     # Define paths for input and output
-    input_files = list(test_h5ad_paths)
+    input_files = test_h5ad_paths
     output_dir = tmp_path / "output"
 
     # Ensure the output directory exists
@@ -38,7 +38,7 @@ def test_cli_get_changes(test_h5ad_paths, tmp_path):
 def test_cli_get_with_aliases(test_h5ad_paths, tmp_path):
     """Test the CLI 'get' command for generating changes."""
     # Define paths for input and output
-    input_files = list(test_h5ad_paths)
+    input_files = test_h5ad_paths
     output_dir = tmp_path / "output"
 
     # Ensure the output directory exists
@@ -46,6 +46,8 @@ def test_cli_get_with_aliases(test_h5ad_paths, tmp_path):
 
     # Prepare the CLI command
     cmd = ["hugo-unifier", "get", "--outdir", str(output_dir)]
+
+    print("input_files", input_files)
 
     for i, input_file in enumerate(input_files):
         cmd.extend(["--input", f"ds{i}:{input_file}"])

@@ -6,7 +6,7 @@ from pathlib import Path
 def test_h5ad_paths():
     """Return the path to the test h5ad file."""
     directory = Path(__file__).parent / "data"
-    return directory.glob("*.h5ad")
+    return list(directory.glob("*.h5ad"))
 
 
 @pytest.fixture(scope="session")
