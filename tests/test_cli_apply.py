@@ -1,4 +1,5 @@
 import subprocess
+import anndata as ad
 
 
 def test_cli_apply_changes(uzzan_h5ad, uzzan_csv, tmp_path):
@@ -28,3 +29,12 @@ def test_cli_apply_changes(uzzan_h5ad, uzzan_csv, tmp_path):
 
     # Check that the output file was created
     assert output_file.exists(), "Output file was not created."
+
+    # Load input and output AnnData objects to verify observation columns
+    original_adata = ad.read_h5ad(input_file)
+    updated_adata = ad.read_h5ad(output_file)
+
+    # Ensure all observation columns are preserved
+    assert set(original_adata.obs.columns) == set(
+        updated_adata.obs.columns
+    ), "Observation columns changed after applying changes"
