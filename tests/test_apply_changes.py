@@ -37,3 +37,8 @@ def test_apply_changes(uzzan_h5ad, uzzan_csv):
     assert len(updated_adata.var.index) == len(adata.var.index) + len(
         df_changes[df_changes["action"] == "copy"]
     ), "Unexpected number of rows in updated AnnData object."
+
+    # Ensure all observation columns are preserved
+    assert set(adata.obs.columns) == set(
+        updated_adata.obs.columns
+    ), "Observation columns changed after applying changes"
