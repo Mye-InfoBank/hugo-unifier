@@ -42,6 +42,8 @@ def apply_changes(adata: ad.AnnData, df_changes: pd.DataFrame):
             # Add a new row to the AnnData object
             adata_row = adata[:, adata.var.index == symbol].copy()
             adata_row.var.index = [new_symbol]
-            adata = ad.concat([adata, adata_row], axis=1)
+            adata = ad.concat(
+                [adata, adata_row], axis="var", merge="unique", uns_merge="unique"
+            )
 
     return adata
