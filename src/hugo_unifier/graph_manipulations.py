@@ -61,32 +61,42 @@ def resolve_unapproved(G: nx.DiGraph, df: pd.DataFrame) -> pd.DataFrame:
             continue
 
         successor = __decide_successor__(G, node, df)
-
         if successor is None:
             continue
 
         node_samples = G.nodes[node]["samples"]
         successor_samples = G.nodes[successor]["samples"]
-        intersection = node_samples.intersection(successor_samples)
-        node_only = node_samples - intersection
-        has_intersection = len(intersection) > 0
-
         edge_type = G[node][successor]["type"]
 
-        action = "copy" if has_intersection else "rename"
+        has_overlap = len(node_samples & successor_samples) > 0
+        global_action = "copy" if has_overlap else "rename"
 
-        for sample in node_only:
+        for sample in node_samples:
+            if sample in successor_samples:
+                # The sample already has both symbols → conflict
+                df.loc[len(df)] = [
+                    sample,
+                    "conflict",
+                    node,
+                    successor,
+                    f"Conflict: both {node} and {successor} are present in sample {sample}. Skipping change.",
+                ]
+                continue
+
+            # If safe: apply rename or copy depending on global situation
             df.loc[len(df)] = [
                 sample,
-                action,
+                global_action,
                 node,
                 successor,
-                f"{edge_type.capitalize().replace('_', ' ')}, {action} because {f'no sample contains both {node} and {successor}' if not has_intersection else f'the following samples contain both {node} and {successor}: {intersection}'}",
+                f"{edge_type.capitalize().replace('_', ' ')}, {global_action} from {node} to {successor} in sample {sample}.",
             ]
+            G.nodes[successor]["samples"].add(sample)
 
-        G.nodes[successor]["samples"].update(node_only)
-        if not has_intersection:
+        # If all samples are now transferred, remove node
+        if G.nodes[node]["samples"].issubset(G.nodes[successor]["samples"]):
             G.remove_node(node)
+
 
 
 def aggregate_approved(G: nx.DiGraph, df: pd.DataFrame) -> pd.DataFrame:
@@ -137,10 +147,21 @@ def aggregate_approved(G: nx.DiGraph, df: pd.DataFrame) -> pd.DataFrame:
             edge_type = G[predecessor][mark]["type"]
 
             for sample in G.nodes[predecessor]["samples"]:
+                if sample in G.nodes[mark]["samples"]:
+                    df.loc[len(df)] = [
+                        sample,
+                        "conflict",
+                        predecessor,
+                        mark,
+                        f"Conflict: both {predecessor} and {mark} are present in sample {sample}. Cannot aggregate.",
+                    ]
+                    continue
+
+                
                 df.loc[len(df)] = [
                     sample,
                     "copy",
                     predecessor,
                     mark,
-                    f"{predecessor} is an approved symbol, but it is also a {edge_type} of {mark}. Copying the contents of {predecessor} to {mark} because this leads to a substantial increase in overlap (> 50%).",
+                    f"{predecessor} is a {G.nodes[predecessor]['type']} and also a {edge_type} of {mark}. Copying because it improves overlap (> 50%).",
                 ]
