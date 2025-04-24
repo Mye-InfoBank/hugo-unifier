@@ -19,8 +19,6 @@ def apply_changes(adata: ad.AnnData, df_changes: pd.DataFrame):
     """
     adata = adata.copy()
 
-    #df_changes = df_changes[df_changes["action"].isin(["rename", "copy"])]
-
     for _, row in df_changes.iterrows():
         if row["action"] not in ["rename", "copy"]:
             continue
