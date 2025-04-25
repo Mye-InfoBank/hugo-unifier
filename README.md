@@ -112,7 +112,7 @@ This includes only two steps:
 
 ### Step 3: Find unification opportunities
 
-Currently, there are two approaches implemented. This can be easily extended in the future.
+Currently, there is only one approach implemented.
 
 #### Resolve unapproved symbols
 
@@ -126,20 +126,6 @@ Thus, we do the following:
 - If an overlap exists (like the "Devlin" dataset in the following example), copy the symbols that are exclusive to the source node to the target node ![Copy previous symbols](https://github.com/Mye-InfoBank/hugo-unifier/blob/main/docs/previous-copy.png?raw=true)
 - If no overlap exists, we can safely remove the source node and rename all symbols from the source node to the target node ![Rename alias symbols](https://github.com/Mye-InfoBank/hugo-unifier/blob/main/docs/dot-to-dash.png?raw=true)
 
-#### Aggregate approved symbols
-
-This tries to resolve situations where one group of datasets contains one approved symbol, while another group of datasets contains another approved symbol, while one is an alias of the other. The logic is as follows:
-
-1. Iterate all nodes representing approved symbols
-2. Get all predecessors of the node
-3. Get the union of the represented datasets of all predecessors and the node itself
-4. Get the maximum number of datasets that are represented by any single predecessor or the node itself
-5. Calculate the improvement ratio as the union size divided by the maximum size
-6. If the improvement ratio is greater than 1.5, copy the symbols from all predecessors to the node
-
-In the example below, the STRA13 gene would be copied to CENPX for all samples that have CENPX but not STRA13. This is because the union is 9 and the largest number of datasets in a single one of the two nodes is 6 in CENPX. The improvement ratio is exactly 1.5, so the copy is done.
-
-![Aggregation of approved symbols](https://github.com/Mye-InfoBank/hugo-unifier/blob/main/docs/approved-aggregation.png?raw=true)
 
 ### Step 4: Provide change dataframe
 
