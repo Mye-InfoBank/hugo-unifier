@@ -9,7 +9,6 @@ from hugo_unifier.graph_manipulations import (
     remove_self_edges,
     remove_loose_ends,
     resolve_unapproved,
-    aggregate_approved,
 )
 
 
@@ -56,7 +55,7 @@ def get_changes(
 
     graph_manipulations: List[Callable[[nx.DiGraph, pd.DataFrame]]] = [
         resolve_unapproved,
-        aggregate_approved,
+        # aggregate_approved,
     ]
 
     df_changes = pd.DataFrame(columns=["sample", "action", "symbol", "new", "reason"])
