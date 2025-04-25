@@ -84,6 +84,15 @@ def resolve_unapproved(G: nx.DiGraph, df: pd.DataFrame) -> pd.DataFrame:
                 f"{edge_type.capitalize().replace('_', ' ')}, {action} because {f'no sample contains both {node} and {successor}' if not has_intersection else f'the following samples contain both {node} and {successor}: {intersection}'}",
             ]
 
+        for sample in intersection:
+            df.loc[len(df)] = [
+                sample,
+                "conflict",
+                node,
+                successor,
+                f"The sample {sample} contains both {node} and {successor}, while {successor} has been identified as the most appropriate successor for {node} by the resolve_unapproved function.",
+            ]
+
         G.nodes[successor]["samples"].update(node_only)
         if not has_intersection:
             G.remove_node(node)

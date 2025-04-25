@@ -30,7 +30,8 @@ def test_cox1_and_co1():
     assert sample1_changes.iloc[0]["new"] == "MT-CO1"
 
     sample2_changes = sample_changes["sample2"]
-    assert len(sample2_changes) == 0
+    assert len(sample2_changes) == 1
+    assert sample2_changes.iloc[0]["action"] == "conflict"
 
 
 def test_single_sample():
@@ -58,7 +59,10 @@ def test_meg8():
     assert len(meg8_node["samples"]) == 2
 
     sample1_changes = sample_changes["sample1"]
-    assert len(sample1_changes) == 0
+    assert len(sample1_changes) == 3
+    assert sample1_changes.iloc[0]["action"] == "conflict"
+    assert sample1_changes.iloc[1]["action"] == "conflict"
+    assert sample1_changes.iloc[2]["action"] == "conflict"
 
 
 def test_cox2():
@@ -90,7 +94,8 @@ def test_cox2_and_co2():
     assert sample1_changes.iloc[0]["new"] == "MT-CO2"
 
     sample2_changes = sample_changes["sample2"]
-    assert len(sample2_changes) == 0
+    assert len(sample2_changes) == 1
+    assert sample2_changes.iloc[0]["action"] == "conflict"
 
 
 def test_cox3():
@@ -122,4 +127,5 @@ def test_cox3_and_co1():
     assert sample1_changes.iloc[0]["new"] == "MT-CO3"
 
     sample2_changes = sample_changes["sample2"]
-    assert len(sample2_changes) == 0
+    assert len(sample2_changes) == 1
+    assert sample2_changes.iloc[0]["action"] == "conflict"
