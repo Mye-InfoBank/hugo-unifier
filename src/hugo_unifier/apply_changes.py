@@ -23,6 +23,10 @@ def apply_changes(adata: ad.AnnData, df_changes: pd.DataFrame):
         symbol = row["symbol"]
         new_symbol = row["new"]
 
+        if action == "conflict":
+            print(f"Conflict for {symbol} -> {new_symbol}")
+            continue
+
         assert (
             symbol in adata.var.index
         ), f"Symbol {symbol} not found in AnnData object."
