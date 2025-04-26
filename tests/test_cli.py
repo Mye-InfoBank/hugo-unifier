@@ -53,3 +53,47 @@ def test_cli_apply_help():
     assert (
         "Apply changes to the input .h5ad file." in result.stdout
     ), "Expected description for 'apply' command not found in output."
+
+
+def test_cli_full_pipeline(test_h5ad_paths, tmp_path):
+    """Test the full pipeline of the CLI."""
+    get_dir = tmp_path / "get"
+    get_dir.mkdir(parents=True, exist_ok=True)
+
+    cmd = ["hugo-unifier", "get", "--outdir", str(get_dir)]
+    for input_file in test_h5ad_paths:
+        cmd.extend(["--input", str(input_file)])
+
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    assert result.returncode == 0, f"Command failed with error: {result.stderr}"
+
+    apply_dir = tmp_path / "apply"
+    apply_dir.mkdir(parents=True, exist_ok=True)
+
+    sample_to_apply = "uzzan"
+    input_file = next(
+        input_file
+        for input_file in test_h5ad_paths
+        if sample_to_apply in input_file.stem
+    )
+
+    changes_file = get_dir / f"{sample_to_apply}.csv"
+    assert changes_file.exists(), f"Changes file {changes_file} not found."
+
+    output_file = apply_dir / f"{sample_to_apply}.h5ad"
+    assert not output_file.exists(), f"Output file {output_file} already exists."
+
+    cmd = [
+        "hugo-unifier",
+        "apply",
+        "--input",
+        str(input_file),
+        "--changes",
+        str(changes_file),
+        "--output",
+        str(output_file),
+    ]
+
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    assert result.returncode == 0, f"Command failed with error: {result.stderr}"
+    assert output_file.exists(), f"Output file {output_file} not created."
