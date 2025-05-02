@@ -53,11 +53,6 @@ def get(input, outdir):
         if not file_path.endswith(".h5ad"):
             raise click.BadParameter(f"File {file_path} must have a .h5ad suffix.")
 
-        # Validate the dataset name
-        if not dataset_name.isidentifier():
-            raise click.BadParameter(
-                f"Dataset name {dataset_name} is not a valid Python identifier."
-            )
         if dataset_name in symbols_dict:
             raise click.BadParameter(
                 f"Dataset name {dataset_name} is duplicated in the input."
