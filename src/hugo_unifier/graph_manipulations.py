@@ -55,7 +55,9 @@ def __decide_successor__(G: nx.DiGraph, node: str, df: pd.DataFrame) -> str:
     return None
 
 
-def resolve_unapproved(G: nx.DiGraph, df: pd.DataFrame) -> pd.DataFrame:
+def resolve_unapproved(
+    G: nx.DiGraph, df: pd.DataFrame, aggregate_isoforms: bool = False
+) -> pd.DataFrame:
     for node in list(G.nodes()):
         if G.nodes[node]["type"] == "approvedSymbol":
             continue
@@ -84,14 +86,16 @@ def resolve_unapproved(G: nx.DiGraph, df: pd.DataFrame) -> pd.DataFrame:
                 f"{edge_type.capitalize().replace('_', ' ')}, {action} because {f'no sample contains both {node} and {successor}' if not has_intersection else f'the following samples contain both {node} and {successor}: {intersection}'}",
             ]
 
+        perform_aggregation = (edge_type == "discard_after_dot") and aggregate_isoforms
+        action = "aggregate" if perform_aggregation else "conflict"
+
         for sample in intersection:
-            df.loc[len(df)] = [
-                sample,
-                "conflict",
-                node,
-                successor,
-                f"The sample {sample} contains both {node} and {successor}, while {successor} has been identified as the most appropriate successor for {node} by the resolve_unapproved function.",
-            ]
+            if perform_aggregation:
+                reason = f"The sample {sample} contains both {node} and {successor}, while {successor} has been identified as the most appropriate successor for {node} by the resolve_unapproved function. Since {node} is an isoform of {successor} and aggregate_isoforms is True, we aggregate the isoforms."
+            else:
+                reason = f"The sample {sample} contains both {node} and {successor}, while {successor} has been identified as the most appropriate successor for {node} by the resolve_unapproved function."
+
+            df.loc[len(df)] = [sample, action, node, successor, reason]
 
         G.nodes[successor]["samples"].update(node_only)
         if not has_intersection:

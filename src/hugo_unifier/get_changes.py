@@ -1,6 +1,5 @@
-from typing import Dict, List, Tuple, Union, Callable
+from typing import Dict, List, Tuple, Union
 import pandas as pd
-import networkx as nx
 
 from hugo_unifier.symbol_manipulations import manipulation_mapping
 from hugo_unifier.orchestrated_fetch import orchestrated_fetch
@@ -15,6 +14,7 @@ from hugo_unifier.graph_manipulations import (
 def get_changes(
     symbols: Dict[str, List[str]],
     manipulations: List[str] = ["identity", "dot_to_dash", "discard_after_dot"],
+    aggregate_isoforms: bool = False,
 ) -> Union[List[str], Tuple[List[str], Dict[str, int]]]:
     """
     Unify gene symbols in a list of symbols.
@@ -53,16 +53,10 @@ def get_changes(
     remove_self_edges(G)
     remove_loose_ends(G)
 
-    graph_manipulations: List[Callable[[nx.DiGraph, pd.DataFrame]]] = [
-        resolve_unapproved,
-        # aggregate_approved,
-    ]
-
     df_changes = pd.DataFrame(columns=["sample", "action", "symbol", "new", "reason"])
 
-    for manipulation in graph_manipulations:
-        # Apply the manipulation to the graph
-        manipulation(G, df_changes)
+    resolve_unapproved(G, df_changes, aggregate_isoforms)
+    # aggregate_approved(G, df_changes)
 
     sample_changes = {
         sample: df_changes[df_changes["sample"] == sample]
