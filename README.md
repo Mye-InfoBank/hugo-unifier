@@ -112,7 +112,18 @@ This includes only two steps:
 
 ### Step 3: Find unification opportunities
 
-Currently, there is only one approach implemented.
+Currently, there are two approaches implemented, applied in sequence.
+
+#### Resolve per dataset
+
+For each unapproved symbol, this step looks at each dataset individually to see if there's a clear resolution within that specific dataset context. The logic works as follows:
+
+1. For each unapproved symbol, examine each dataset that contains it
+2. Look at all the approved symbols that the unapproved symbol connects to (its neighbors in the graph)
+3. Check which of these approved neighbors are **not** present in the current dataset
+4. If exactly one approved neighbor is missing from the dataset, rename the unapproved symbol to that missing approved symbol in this specific dataset
+
+This approach handles cases where an unapproved symbol has multiple potential approved targets, but the dataset context makes the choice clear. For example, if an unapproved symbol connects to three approved symbols, but two of them are already present in a particular dataset, then the third one is the obvious choice for that dataset.
 
 #### Resolve unapproved symbols
 
