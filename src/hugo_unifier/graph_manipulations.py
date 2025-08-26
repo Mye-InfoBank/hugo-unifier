@@ -55,6 +55,37 @@ def __decide_successor__(G: nx.DiGraph, node: str, df: pd.DataFrame) -> str:
     return None
 
 
+def resolve_per_dataset(G: nx.DiGraph, df: pd.DataFrame) -> pd.DataFrame:
+    # Iterate all unapproved nodes
+    # For each sample, check if all except one of the approved symbols are also present in the sample
+    # If so, rename the unapproved symbol to the last remaining approved symbol
+
+    for node in list(G.nodes()):
+        if G.nodes[node]["type"] == "approvedSymbol":
+            continue
+
+        samples = list(G.nodes[node]["samples"])
+        for sample in samples:
+            non_used_neighbors = []
+            for neighbor in G.neighbors(node):
+                if sample not in G.nodes[neighbor]["samples"]:
+                    non_used_neighbors.append(neighbor)
+
+            if len(non_used_neighbors) == 1:
+                target_neighbor = non_used_neighbors[0]
+                df.loc[len(df)] = [
+                    sample,
+                    "copy",
+                    node,
+                    target_neighbor,
+                    f"The unapproved symbol {node} is present in {sample} and only one of its approved neighbors ({target_neighbor}) is not also present in {sample}. Therefore, moving {node} to {target_neighbor} in {sample}.",
+                ]
+                G.nodes[target_neighbor]["samples"].add(sample)
+                G.nodes[node]["samples"].remove(sample)
+
+    return df
+
+
 def resolve_unapproved(G: nx.DiGraph, df: pd.DataFrame) -> pd.DataFrame:
     for node in list(G.nodes()):
         if G.nodes[node]["type"] == "approvedSymbol":
