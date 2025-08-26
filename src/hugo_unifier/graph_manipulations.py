@@ -75,10 +75,10 @@ def resolve_per_dataset(G: nx.DiGraph, df: pd.DataFrame) -> pd.DataFrame:
                 target_neighbor = non_used_neighbors[0]
                 df.loc[len(df)] = [
                     sample,
-                    "copy",
+                    "rename",
                     node,
                     target_neighbor,
-                    f"The unapproved symbol {node} is present in {sample} and only one of its approved neighbors ({target_neighbor}) is not also present in {sample}. Therefore, moving {node} to {target_neighbor} in {sample}.",
+                    f"The unapproved symbol {node} is present in {sample} and only one of its approved neighbors ({target_neighbor}) is not also present in {sample}. Therefore, renaming {node} to {target_neighbor} in {sample}.",
                 ]
                 G.nodes[target_neighbor]["samples"].add(sample)
                 G.nodes[node]["samples"].remove(sample)
