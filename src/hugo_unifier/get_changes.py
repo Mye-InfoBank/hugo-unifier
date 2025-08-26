@@ -9,6 +9,7 @@ from hugo_unifier.graph_manipulations import (
     remove_self_edges,
     remove_loose_ends,
     resolve_unapproved,
+    resolve_per_dataset,
 )
 
 
@@ -54,6 +55,7 @@ def get_changes(
     remove_loose_ends(G)
 
     graph_manipulations: List[Callable[[nx.DiGraph, pd.DataFrame]]] = [
+        resolve_per_dataset,
         resolve_unapproved,
         # aggregate_approved,
     ]
