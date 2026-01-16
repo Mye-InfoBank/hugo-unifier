@@ -43,14 +43,14 @@ def __decide_successor__(G: nx.DiGraph, node: str, df: pd.DataFrame) -> str:
     }
 
     if len(nonempty_successors) == 1:
-        return list(nonempty_successors)[0]
+        return list(nonempty_successors.keys())[0]
     if len(nonempty_successors) > 1:
         df.loc[len(df)] = [
             None,
             "conflict",
             node,
             None,
-            f"The unapproved symbol {node} is present in {node_samples} and has multiple connections to approved symbols, and multiple of them are present in samples: {', '.join([f'{successor} ({samples}' for successor, samples in nonempty_successors.items()])}. We cannot decide which one to use.",
+            f"The unapproved symbol {node} is present in {sorted(node_samples)} and has multiple connections to approved symbols, and multiple of them are present in samples: {', '.join([f'{successor} ({sorted(samples)}' for successor, samples in sorted(nonempty_successors.items())])}. We cannot decide which one to use.",
         ]
     return None
 
@@ -64,7 +64,7 @@ def resolve_per_dataset(G: nx.DiGraph, df: pd.DataFrame) -> pd.DataFrame:
         if G.nodes[node]["type"] == "approvedSymbol":
             continue
 
-        samples = list(G.nodes[node]["samples"])
+        samples = sorted(G.nodes[node]["samples"])  # Sort for deterministic order
         for sample in samples:
             non_used_neighbors = []
             for neighbor in G.neighbors(node):
@@ -106,16 +106,16 @@ def resolve_unapproved(G: nx.DiGraph, df: pd.DataFrame) -> pd.DataFrame:
 
         action = "copy" if has_intersection else "rename"
 
-        for sample in node_only:
+        for sample in sorted(node_only):  # Sort for deterministic order
             df.loc[len(df)] = [
                 sample,
                 action,
                 node,
                 successor,
-                f"{edge_type.capitalize().replace('_', ' ')}, {action} because {f'no sample contains both {node} and {successor}' if not has_intersection else f'the following samples contain both {node} and {successor}: {intersection}'}",
+                f"{edge_type.capitalize().replace('_', ' ')}, {action} because {f'no sample contains both {node} and {successor}' if not has_intersection else f'the following samples contain both {node} and {successor}: {sorted(intersection)}'}",
             ]
 
-        for sample in intersection:
+        for sample in sorted(intersection):  # Sort for deterministic order
             df.loc[len(df)] = [
                 sample,
                 "conflict",

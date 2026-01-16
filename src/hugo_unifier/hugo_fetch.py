@@ -37,8 +37,8 @@ def fetch_symbol_check_results(symbols: List[str]) -> pd.DataFrame:
             "json",
         ),  # Changed output to json for easier parsing with pd.DataFrame
         *[
-            ("queries[]", symbol) for symbol in set(symbols)
-        ],  # Use set to avoid duplicates
+            ("queries[]", symbol) for symbol in sorted(set(symbols))
+        ],  # Use sorted set to avoid duplicates and ensure deterministic order
         ("synonyms", "true"),
         ("unmatched", "true"),  # Include symbols that didn't match anything
         ("withdrawn", "true"),
