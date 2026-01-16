@@ -45,7 +45,7 @@ def get_changes(
     symbol_union = set()
     for sample_symbols in symbols.values():
         symbol_union.update(sample_symbols)
-    symbol_union = list(symbol_union)
+    symbol_union = sorted(symbol_union)  # Sort for deterministic order
 
     # Process the symbols
     df_hugo = orchestrated_fetch(symbol_union, selected_manipulations)
