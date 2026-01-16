@@ -1,7 +1,6 @@
 """Tests to ensure output reproducibility via hash comparison."""
 
 import hashlib
-import subprocess
 
 import anndata as ad
 import pandas as pd
@@ -116,7 +115,7 @@ def test_apply_changes_hash_stability(uzzan_h5ad, uzzan_csv):
     actual_hash = compute_adata_hash(updated_adata)
     
     if actual_hash != EXPECTED_APPLY_HASH:
-        print(f"\n\nActual hash (copy to update EXPECTED_APPLY_HASH):")
+        print("\n\nActual hash (copy to update EXPECTED_APPLY_HASH):")
         print(f'EXPECTED_APPLY_HASH = "{actual_hash}"')
         
         assert False, (
